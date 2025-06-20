@@ -31,8 +31,8 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 @login_required
 def item_list(request):
     form = ItemFilterForm(request.GET)
-    items = Item.objects.all()
-    
+    #items = Item.objects.all()
+    items = Item.objects.all().order_by('-date_created')
     
     if request.method == "POST" and request.POST.get("add") == "1":
         post_type = request.POST.get("item_type")
