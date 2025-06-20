@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 import os
 import openai
 import json
+from django.contrib.auth.decorators import login_required
 
 
 from interface.models import Domain, Field, Branch
@@ -27,7 +28,7 @@ print("KEY:", os.environ.get("OPENAI_API_KEY"))
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-
+@login_required
 def item_list(request):
     form = ItemFilterForm(request.GET)
     items = Item.objects.all()
