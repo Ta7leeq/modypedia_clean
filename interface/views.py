@@ -89,7 +89,7 @@ def item_list(request):
     return render(request, 'interface/item_list.html', {'form': form, 'items': items,'count':count})
 
 
-
+@login_required
 def details(request,item_id):
     
     item = get_object_or_404(Item, id=item_id)
@@ -148,6 +148,7 @@ def details(request,item_id):
             
     return render(request, 'interface/details.html', {'item': item})
 
+@login_required
 def memory(request):
 
     
@@ -229,7 +230,7 @@ def memory(request):
     return render(request, 'interface/today_list.html', {'form': form, 'items': items})
 
 
-
+@login_required
 def new(request):
     if request.method == 'POST':
         
@@ -334,6 +335,7 @@ def new(request):
 
     return render(request, 'interface/new.html', {'form': form, 'items': items})
 
+@login_required
 def reset(request):
     if request.method == 'POST':
         
@@ -438,6 +440,7 @@ def reset(request):
 
     return render(request, 'interface/new.html', {'form': form, 'items': items})
 
+@login_required
 def task(request):
     if request.method == 'POST':
         
@@ -495,7 +498,7 @@ def task(request):
 
     return render(request, 'interface/tasks.html', {'form': form, 'items': items})
 
-
+@login_required
 def test(request):
     
     if request.method == 'POST':
