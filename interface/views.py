@@ -640,7 +640,7 @@ def ask_chatgpt(title,description,link,domains,fields,branches):
             Detect the platform from the link if present.
             Use the provided lists of Domains, Fields, and Branches to classify the content.
             If no exact match is found in any category, suggest a new one instead.
-            If no title is given, generate a clear, relevant title from the content.
+            Only if no title is given, generate a clear, relevant title from the content, else take the given title!
             Dont use domain General
             The domain should be always the wider category
             then it goes narrower to the field and narrower to the domain
