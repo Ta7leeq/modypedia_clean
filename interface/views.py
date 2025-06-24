@@ -13,20 +13,67 @@ from django.db.models import Q,F
 import time
 from openai import OpenAI
 
+from django.http import HttpResponseBadRequest
 from dotenv import load_dotenv
 import os
 import openai
 import json
 from django.contrib.auth.decorators import login_required
+import openpyxl
 
-
-from interface.models import Domain, Field, Branch
+from interface.models import Domain, Field, Branch, Area
 load_dotenv()  # Load variables from .env
 
 
 print("KEY:", os.environ.get("OPENAI_API_KEY"))
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+
+def upload_exercise(request):
+    if request.method == 'POST':
+        domain_name = Domain.objects.get(id=request.POST.get("domain")).domain_name
+        field_name = Field.objects.get(id=request.POST.get("field")).field_name
+        branch_name = Branch.objects.get(id=request.POST.get("branch")).branch_name
+
+        print(domain_name,field_name,branch_name)
+
+        uploaded_file = request.FILES.get('exercise_file')
+        #print(f"Selected domain: {form.cleaned_data['domain']}")
+
+        if not uploaded_file:
+            return HttpResponseBadRequest("No file uploaded.")
+
+        if not uploaded_file.name.endswith('.xlsx'):
+            return HttpResponseBadRequest("Only .xlsx files are accepted.")
+
+        if uploaded_file.size > 10 * 1024 * 1024:
+            return HttpResponseBadRequest("File is too large (max 10MB).")
+
+        # Load workbook from uploaded file
+        wb = openpyxl.load_workbook(uploaded_file)
+        sheet = wb.active  # or wb[sheet_name] if you want a specific sheet
+
+        print("\n--- Uploaded Rows ---")
+        pairs = []
+        for row in sheet.iter_rows(min_row=2, values_only=True):  # skip header
+            if row[0] and len(row) >= 3 and row[2]:  # column 0 = sentence, column 2 = word
+                sentence = str(row[0]).strip()
+                word = str(row[2]).strip()
+                pairs.append((word, sentence))
+
+        filename_wo_ext = os.path.splitext(uploaded_file.name)[0]
+        print(f"\nUploaded file: {filename_wo_ext}")
+
+        for pair in pairs:
+            store_post("Note", pair[0], pair[1], "None","None", domain_name,field_name, branch_name,filename_wo_ext, author="Mody")
+
+            print(pair[0])
+
+
+        return HttpResponseBadRequest("uploaded successfully.")
+
+    return HttpResponseBadRequest("Invalid request method.")
 
 @login_required
 def item_list(request):
@@ -45,7 +92,7 @@ def item_list(request):
         branches=Branch.objects.all()
         
         gpt_classifiction=ask_chatgpt(title,description,link,domains,fields,branches)
-        store_post(post_type, gpt_classifiction["title"], gpt_classifiction["description"], gpt_classifiction["platform"],link, gpt_classifiction["domain"], gpt_classifiction["field"], gpt_classifiction["branch"], author="Mody")
+        store_post(post_type, gpt_classifiction["title"], gpt_classifiction["description"], gpt_classifiction["platform"],link, gpt_classifiction["domain"], gpt_classifiction["field"], gpt_classifiction["branch"],"None", author="Mody")
         #print(gpt_classifiction["platform"])
         print(gpt_classifiction)
         
@@ -726,13 +773,14 @@ def parse_response_to_json(response_text):
         print(f"Error details: {e}")
         return None
 
-def store_post(post_type,title,description,platform_name, link, domain_name, field_name, branch_name, author="Mody"):
+def store_post(post_type,title,description,platform_name, link, domain_name, field_name, branch_name,area_name, author="Mody"):
     try:
         # Lookups
         platform, _ = Platform.objects.get_or_create(platform_name=platform_name)
         domain, _ = Domain.objects.get_or_create(domain_name=domain_name)
         field, _ = Field.objects.get_or_create(field_name=field_name)
         branch, _ = Branch.objects.get_or_create(branch_name=branch_name)
+        area, _ = Area.objects.get_or_create(area_name=area_name)
 
         
 
@@ -756,6 +804,8 @@ def store_post(post_type,title,description,platform_name, link, domain_name, fie
             domain=domain,
             field=field,
             branch=branch,
+            area=area,
+
             link=link,
             init_time=today_date,
             last_time=today_date,

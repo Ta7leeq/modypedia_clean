@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import item_list,memory,details,new,task,reset,test
+from .views import item_list,memory,details,new,task,reset,test,upload_exercise
 
 urlpatterns = [
     path('', item_list, name='item_list'),
@@ -10,6 +10,8 @@ urlpatterns = [
     path('details/<int:item_id>/', details, name='details'),
     
     path('test/', test, name='test'),
+
+    path('upload_exercise/', upload_exercise, name='upload_exercise'),
 
     # Add other paths as needed
 ]

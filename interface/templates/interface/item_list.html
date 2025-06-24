@@ -11,7 +11,35 @@ All Items!
 
 {% block content %}
 <div class="container mt-5">
+    <!-- File Upload Instructions -->
+    <section class="container mb-5">
+        <div class="bg-white rounded shadow p-4">
+            <h2 class="font-serif-title h4 mb-3">upload list of items</h2>
+            <p class="text-muted mb-3">Please select the exercise file you wish to upload. Accepted formats: .xlsx. Max file size: 10MB.</p>
+            
 
+            <form action="/upload_exercise/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="exercise_file" class="form-label">Exercise File</label>
+                    <input class="form-control" type="file" id="exercise_file" name="exercise_file" accept=".xlsx">
+                </div>
+
+                {% for field in form.visible_fields %}
+                    {% if field.name == 'domain' or field.name == 'field' or field.name == 'branch' %}
+                        <div class="form-group mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary mt-2">Upload</button>
+            </form>
+
+        </div>
+  </section>
 
 
     <h2 class="mb-3">Add Item</h2>
