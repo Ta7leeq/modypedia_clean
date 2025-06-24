@@ -70,8 +70,8 @@ def upload_exercise(request):
 
             print(pair[0])
 
-
-        return HttpResponseBadRequest("uploaded successfully.")
+        return redirect('item_list')
+        r#eturn HttpResponseBadRequest("uploaded successfully.")
 
     return HttpResponseBadRequest("Invalid request method.")
 
