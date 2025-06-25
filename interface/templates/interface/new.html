@@ -28,7 +28,7 @@ New Items!
         <ul class="items-list">
             {% for item in items %}
             <li class="item">
-                <div class="item-form">
+                <div class="item-form" id="{% if forloop.first %}scroll-target{% endif %}">
                     <!-- Item Title -->
                     <a href="{% url 'details' item.id %}" class="item-title">{{ item.title }}</a>
 
@@ -85,8 +85,13 @@ New Items!
     }
 </script>
 
-{%endblock%}
+<script>
+  window.onload = () => {
+    document.getElementById('scroll-target')?.scrollIntoView({ behavior: 'smooth' });
+  };
+</script>
 
+{%endblock%}
 
 
 
