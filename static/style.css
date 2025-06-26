@@ -121,6 +121,12 @@ body {
     
 }
 
+pre.item-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 /* Item Title */
 .item-title {
     font-size: 22px;
