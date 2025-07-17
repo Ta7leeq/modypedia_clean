@@ -644,7 +644,7 @@ def calculate_next_time(last_time, next_time):
     
     # Cap the interval at 90 days (approximately 3 months)
     max_interval = 90
-    if next_interval > max_interval:
+    if next_interval >= max_interval:
         next_interval = max_interval
 
     # Calculate the next review time by adding the interval in days
