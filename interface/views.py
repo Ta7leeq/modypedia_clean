@@ -79,8 +79,10 @@ def upload_exercise(request):
 def item_list(request):
     form = ItemFilterForm(request.GET)
     #items = Item.objects.all()
-    items = Item.objects.all().order_by('-date_created')
-    
+    #items = Item.objects.all().order_by('-date_created')
+    items = Item.objects.filter(author=request.user.username).order_by('-date_created')
+
+
     if request.method == "POST" and request.POST.get("add") == "1":
         post_type = request.POST.get("item_type")
         
@@ -649,7 +651,7 @@ def calculate_next_time(last_time, next_time):
 
     # Calculate the next review time by adding the interval in days
     next_time = last_time + timedelta(days=next_interval)
-
+    print(next_time)
     return next_time
 
 def reset_date():
