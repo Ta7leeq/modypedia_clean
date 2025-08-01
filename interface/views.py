@@ -66,7 +66,7 @@ def upload_exercise(request):
         print(f"\nUploaded file: {filename_wo_ext}")
 
         for pair in pairs:
-            store_post("Note", pair[0], pair[1], "None","None", domain_name,field_name, branch_name,filename_wo_ext, author="Mody")
+            store_post("Note", pair[0], pair[1], "None","None", domain_name,field_name, branch_name,filename_wo_ext, author=request.user.username)
 
             print(pair[0])
 
@@ -95,7 +95,7 @@ def item_list(request):
         branches=Branch.objects.all()
         
         gpt_classifiction=ask_chatgpt(title,description,link,domains,fields,branches)
-        store_post(post_type, gpt_classifiction["title"], gpt_classifiction["description"], gpt_classifiction["platform"],link, gpt_classifiction["domain"], gpt_classifiction["field"], gpt_classifiction["branch"],"None", author="Mody")
+        store_post(post_type, gpt_classifiction["title"], gpt_classifiction["description"], gpt_classifiction["platform"],link, gpt_classifiction["domain"], gpt_classifiction["field"], gpt_classifiction["branch"],"None", author=request.user.username)
         #print(gpt_classifiction["platform"])
         print(gpt_classifiction)
         
@@ -779,7 +779,7 @@ def parse_response_to_json(response_text):
         print(f"Error details: {e}")
         return None
 
-def store_post(post_type,title,description,platform_name, link, domain_name, field_name, branch_name,area_name, author="Mody"):
+def store_post(post_type,title,description,platform_name, link, domain_name, field_name, branch_name,area_name, author):
     try:
         # Lookups
         platform, _ = Platform.objects.get_or_create(platform_name=platform_name)
@@ -819,7 +819,7 @@ def store_post(post_type,title,description,platform_name, link, domain_name, fie
             hide_time=today_timestamp
         )
 
-        print(f"✅ {platform_name} post stored successfully.")
+        print(f"✅ {author} post stored successfully.")
         return True
 
     except (Domain.DoesNotExist, Field.DoesNotExist, Platform.DoesNotExist) as e:
