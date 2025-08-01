@@ -80,7 +80,8 @@ def item_list(request):
     form = ItemFilterForm(request.GET)
     #items = Item.objects.all()
     #items = Item.objects.all().order_by('-date_created')
-    items = Item.objects.filter(author=request.user.username).order_by('-date_created')
+    #items = Item.objects.filter(author=request.user.username).order_by('-date_created') #case sensitive filter
+    items = Item.objects.filter(author__iexact=request.user.username).order_by('-date_created')
 
 
     if request.method == "POST" and request.POST.get("add") == "1":
