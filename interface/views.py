@@ -259,9 +259,16 @@ def memory(request):
         
     form = ItemFilterForm(request.GET)
     #items = Item.objects.filter(next_time__lte=date.today())
-    items = Item.objects.filter(author__iexact=request.user.username)
+    #items = Item.objects.filter(author__iexact=request.user.username)
 
-    items = items.objects.filter(Q(hide_time__lte=time.time()) & Q(next_time__lte=date.today()) & ~Q(next_time=F('last_time')) & ~Q(item_type ="Task") )
+    items = Item.objects.filter(author__iexact=request.user.username)
+    items = items.filter(
+        Q(hide_time__lte=time.time()) &
+        Q(next_time__lte=date.today()) &
+        ~Q(next_time=F('last_time')) &
+        ~Q(item_type="Task")
+    )
+
 
     if form.is_valid():
         if form.cleaned_data['item_type']:
@@ -350,10 +357,15 @@ def new(request):
 
         
     form = ItemFilterForm(request.GET)
-    
     items = Item.objects.filter(author__iexact=request.user.username)
-    items = items.objects.filter(Q(hide_time__lte=time.time()) & Q(next_time__lte=date.today()) & Q(next_time=F('last_time'))& ~Q(item_type ="Task") & Q(last_time=F('init_time')  ))
-    
+    items = items.filter(
+        Q(hide_time__lte=time.time()) &
+        Q(next_time__lte=date.today()) &
+        Q(next_time=F('last_time')) &
+        ~Q(item_type="Task") &
+        Q(last_time=F('init_time'))
+    )
+
     if form.is_valid():
         
         if form.cleaned_data['item_type']:
@@ -454,7 +466,14 @@ def reset(request):
     form = ItemFilterForm(request.GET)
     
     
-    items = Item.objects.filter(Q(hide_time__lte=time.time()) & Q(next_time__lte=date.today()) & Q(next_time=F('last_time'))& ~Q(item_type ="Task") & ~Q(last_time=F('init_time')  ))       
+    items = Item.objects.filter(
+    Q(author__iexact=request.user.username) &
+    Q(hide_time__lte=time.time()) &
+    Q(next_time__lte=date.today()) &
+    Q(next_time=F('last_time')) &
+    ~Q(item_type="Task") &
+    ~Q(last_time=F('init_time'))
+    )
     
 
     
@@ -542,7 +561,10 @@ def task(request):
         
     form = ItemFilterForm(request.GET)
     items = Item.objects.filter(author__iexact=request.user.username)
-    items = items.objects.filter(Q(next_time__lte=date.today()) & Q(item_type="Task"))
+    items = items.filter(
+        Q(next_time__lte=date.today()) &
+        Q(item_type="Task")
+    )
     
     
     
