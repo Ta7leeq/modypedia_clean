@@ -38,7 +38,7 @@ Todays Items!
                     <div class="item-form" id="{% if forloop.first %}scroll-target{% endif %}">
                         <!-- Item Title -->
                         <a href="{% url 'details' item.id %}" class="item-title">{{ item.title }}</a>
-
+                        <a href="{% url 'translate_to_arabic' item.id %}" target="_blank" class="item-title" style="display:inline-block; padding:6px 12px; background-color:#c8e7c4; border:1px solid #ccc; border-radius:6px; text-decoration:none; color:#333; font-family:Arial, sans-serif;">ar</a>
                         <!-- Toggle Button -->
                         <button type="button" class="btn-show-content" onclick="this.nextElementSibling.style.visibility = 'visible'">
                             Show Answer

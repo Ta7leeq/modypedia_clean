@@ -99,8 +99,14 @@ def item_list(request):
         #print(gpt_classifiction["platform"])
         print(gpt_classifiction)
         
-        
+    # elif request.method == "POST":
+    #     print("good morning")   
+    #     selected_author = request.POST.get("author")
        
+    #     item = get_object_or_404(Item, id=item_id)
+    #     item.author = selected_author
+    #     item.save()
+    #     print("Updated author to:", selected_author)  # still prints in terminal for feedback
 
     if form.is_valid():
         cd = form.cleaned_data  # shorthand
@@ -350,6 +356,14 @@ def new(request):
             hide_item = Item.objects.get(id=post_id)
             hide_item.hide_time=time.time()+21600
             hide_item.save()
+        
+        elif 'arabic':
+            post_id=request.POST.get('arabic')
+            translate_item = Item.objects.get(id=post_id)
+            translation=chatgpt_ar(translate_item.content)
+                     
+
+            #print(translation)
 
 
            
@@ -762,15 +776,29 @@ def ask_chatgpt(title,description,link,domains,fields,branches):
         ]
     
     )
-    #raw = response.choices[0].message.content.strip("` \n")
-    #raw = response.choices[0].message.content
-    #print("RAW RESPONSE:")
-    #print(repr(raw))   
-    #json_data = json.loads(raw)
+    
     json_data=parse_response_to_json(response.choices[0].message.content)
 
     return json_data
-    #return "none"
+
+def chatgpt_ar(german_sentence):
+    
+    prompt = f"""Du bist ein Deutschlehrer, der arabischsprachigen Lernenden hilft. Wenn ich dir einen deutschen Satz gebe, übersetze ihn ins Arabische (Hocharabisch) – so, dass die Bedeutung jedes einzelnen Wortes im Satz erhalten bleibt. Versuche so genau wie möglich, jedes Wort entsprechend seiner Funktion im Satz in die arabische Sprache zu übertragen – in einem vollständigen, natürlichen Satz. Keine zusätzlichen Erklärungen, keine Kommentare – nur die Übersetzung.
+
+    Satz: {german_sentence}"""
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a german arabic translator."},
+            {"role": "user", "content": prompt}
+        ]
+    
+    )
+    return response.choices[0].message.content.strip()
+
+   
+
 
 
 
@@ -849,4 +877,21 @@ def store_post(post_type,title,description,platform_name, link, domain_name, fie
         return False
     
 
+
+def update_item_author(request, item_id):
+    if request.method == "POST":
+        selected_author = request.POST.get("author")
+        item = get_object_or_404(Item, id=item_id)
+        item.author = selected_author
+        item.save()
+        print("Updated author to:", selected_author)  # still prints in terminal for feedback
+    return redirect('item_list')
+
+
+def translate_to_arabic(request, item_id):
+   
+    translate_item = Item.objects.get(id=item_id)
+    translation=chatgpt_ar(translate_item.content)
+       
     
+    return render(request, "interface/translation_popup.html", {"translation": translation})
