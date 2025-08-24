@@ -879,10 +879,17 @@ def store_post(post_type,title,description,platform_name, link, domain_name, fie
 
 
 def update_item_author(request, item_id):
+    
     if request.method == "POST":
+        today_date = date.today()
         selected_author = request.POST.get("author")
         item = get_object_or_404(Item, id=item_id)
         item.author = selected_author
+        
+        item.init_time=today_date
+        
+        item.last_time=today_date
+        item.next_time=today_date
         item.save()
         print("Updated author to:", selected_author)  # still prints in terminal for feedback
     return redirect('item_list')
