@@ -670,28 +670,58 @@ def test(request):
     return render(request, 'interface/test.html', {'form': form, 'items': items})
 
 
-def calculate_next_time(last_time, next_time):
-    # Calculate the current interval in days between last_time and next_time
-    current_interval = (next_time - last_time).days
+# def calculate_next_time(last_time, next_time):
+#     # Calculate the current interval in days between last_time and next_time
+#     current_interval = (next_time - last_time).days
 
-    # Initialize the next Fibonacci interval
-    if current_interval == 0:
-        next_interval = 1  # Start from 1 if the interval is zero (initial case)
-    elif current_interval == 1:
-        next_interval = 2  # Start with the second Fibonacci number
-    else:
-        # Apply the Fibonacci sequence by calculating the next interval
-        prev_interval = current_interval
-        next_interval = current_interval + prev_interval
+#     # Initialize the next Fibonacci interval
+#     if current_interval == 0:
+#         next_interval = 1  # Start from 1 if the interval is zero (initial case)
+#     elif current_interval == 1:
+#         next_interval = 2  # Start with the second Fibonacci number
+#     else:
+#         # Apply the Fibonacci sequence by calculating the next interval
+#         prev_interval = current_interval
+#         next_interval = current_interval + prev_interval
     
-    # Cap the interval at 90 days (approximately 3 months)
-    max_interval = 90
-    if next_interval >= max_interval:
-        next_interval = max_interval
+#     # Cap the interval at 90 days (approximately 3 months)
+#     max_interval = 90
+#     if next_interval >= max_interval:
+#         next_interval = max_interval
 
-    # Calculate the next review time by adding the interval in days
-    next_time = last_time + timedelta(days=next_interval)
-    print(next_time)
+#     # Calculate the next review time by adding the interval in days
+#     next_time = last_time + timedelta(days=next_interval)
+#     print(next_time)
+#     return next_time
+
+
+def calculate_next_time(last_time, next_time):
+    """
+    Calculate next review date using Fibonacci growth,
+    but once the current interval is >= 90 days,
+    keep it fixed at 90 days and count forward from next_time.
+    """
+    current_interval = (next_time - last_time).days
+    max_interval = 90
+
+    if current_interval == 0:
+        next_interval = 1
+        base_time = last_time
+    elif current_interval == 1:
+        next_interval = 2
+        base_time = last_time
+    elif current_interval >= max_interval:
+        # lock at 90 days and add from the latest next_time
+        next_interval = max_interval
+        base_time = next_time
+    else:
+        # fibonacci growth
+        next_interval = current_interval + current_interval
+        if next_interval > max_interval:
+            next_interval = max_interval
+        base_time = last_time
+
+    next_time = base_time + timedelta(days=next_interval)
     return next_time
 
 def reset_date():
